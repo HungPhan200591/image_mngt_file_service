@@ -1,18 +1,19 @@
-type Query {
-    getAllImages: [Image]
-}
-
-type Mutation {
-    uploadImage(userId: String!, url: String!, fileName: String!, mimeType: String!, size: Int!): Image
-    deleteImage(id: String!): Boolean
-}
-
 
 type Image {
-    id: String
+    imageId: ID!
     userId: String
     url: String
     fileName: String
     uploadedAt: String
     mimeType: String
+    size: Int
+}
+
+input ImageInput {
+    userId: String
+    url: String
+    fileName: String
+    uploadedAt: String
+    mimeType: String
+    size: Int
 }

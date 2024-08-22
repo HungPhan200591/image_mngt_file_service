@@ -1,30 +1,45 @@
 package lazy.demo.image_mngt_file_service.resolver;
 
-import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.UUID;
 
-@Component
-public class ImageResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
+@Controller
+public class ImageResolver {
 
     @Autowired
     private ImageService imageService;
 
-    public List<Image> getAllImages() {
+    @QueryMapping
+    public List<Image> allImages() {
         return imageService.getAllImages();
     }
 
-    public Image uploadImage(String userId, String url, String fileName, String mimeType, long size) {
-        return imageService.uploadImage(userId, url, fileName, mimeType, size);
+    @QueryMapping
+    public Image getImage(@Argument UUID id) {
+        return imageService.getImageById(id);
     }
 
-    public boolean deleteImage(String id) {
+    @MutationMapping
+    public Image saveImage(@Argument Image image) {
+        return imageService.saveImage(image);
+    }
+
+    @MutationMapping
+    public Image updateImage(@Argument UUID id, @Argument Image image) {
+        return imageService.updateImage(id, image);
+    }
+
+    @MutationMapping
+    public String deleteImage(@Argument UUID id) {
         imageService.deleteImage(id);
-        return true;
+        return "Image deleted successfully";
     }
 }
