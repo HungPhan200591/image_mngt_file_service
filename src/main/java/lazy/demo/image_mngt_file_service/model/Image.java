@@ -1,37 +1,42 @@
 package lazy.demo.image_mngt_file_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "Images")
+@Document(collection = "images")
 public class Image {
     @Id
-    @GeneratedValue
-    @UuidGenerator
-    private UUID imageId;
+    private UUID _imageId;
     private String userId;
     private String url;
-    private String fileName;
+    private String imageFileName;
     private LocalDateTime uploadedAt;
     private String mimeType;
+    private String imageType;
+    private Integer imageWidth;
+    private Integer imageHeight;
+    private Double imageRatio;
+    private Integer imageRotation;
+    private Double imageScale;
+    private String imageArtist;
     private long size;
+
+    @PostConstruct
+    private void init() {
+        if (this._imageId == null) {
+            this._imageId = UUID.randomUUID();
+        }
+    }
 }

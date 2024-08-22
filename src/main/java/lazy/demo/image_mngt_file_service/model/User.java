@@ -1,7 +1,6 @@
 package lazy.demo.image_mngt_file_service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 @Builder
 public class User {
 
-    @Id
     private Long userId;
 
     private String username;

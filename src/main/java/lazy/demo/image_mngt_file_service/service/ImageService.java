@@ -2,30 +2,31 @@ package lazy.demo.image_mngt_file_service.service;
 
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.repository.ImageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class ImageService {
 
-    @Autowired
-    private ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
+    private final ModelMapper modelMapper;
 
     public Image saveImage(Image image) {
-        return imageRepository.save(image);
-    }
-
-    public Image updateImage(UUID id, Image imageDetails) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
-        image.setUserId(imageDetails.getUserId());
-        image.setUrl(imageDetails.getUrl());
-        image.setFileName(imageDetails.getFileName());
-        image.setUploadedAt(imageDetails.getUploadedAt());
-        image.setMimeType(imageDetails.getMimeType());
-        image.setSize(imageDetails.getSize());
         return imageRepository.save(image);
     }
 
@@ -40,5 +41,69 @@ public class ImageService {
     public void deleteImage(UUID id) {
         Image image = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
         imageRepository.delete(image);
+    }
+
+    public void scanImageInFolder(String folderPath) throws IOException {
+        File directoryPath = new File(folderPath);
+
+        File[] files = directoryPath.listFiles();
+
+        if (Objects.isNull(files)) {
+            return;
+        }
+
+        List<Image> images = new ArrayList<>();
+
+        for (File file : files) {
+
+            if (file.isDirectory()) {
+                continue;
+            }
+
+            String fileName = file.getName();
+
+            String baseName = FilenameUtils.getBaseName(fileName);
+            String extension = FilenameUtils.getExtension(fileName);
+            if (!(extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png"))) {
+                continue;
+            }
+
+            Image image = getImage(file);
+
+            image.setImageFileName(baseName);
+            image.setMimeType(extension);
+            image.setUrl(file.getPath());
+
+            images.add(image);
+        }
+
+        System.out.println(images);
+        imageRepository.saveAll(images);
+    }
+
+    public Image getImage (File file) throws IOException {
+
+        Image image = new Image();
+        try (ImageInputStream stream = ImageIO.createImageInputStream(file)) {
+            ImageReader reader = ImageIO.getImageReaders(stream).next();
+            reader.setInput(stream);
+
+            int width = reader.getWidth(0);
+            int height = reader.getHeight(0);
+
+            reader.dispose();
+
+            double imageRatio = (double) Math.round((double) width / height * 100) / 100;
+
+            image.setImageWidth(width);
+            image.setImageHeight(height);
+            image.setImageRatio(imageRatio);
+        }
+
+        return image;
+    }
+
+    public void deleteAllImage() {
+        imageRepository.deleteAll();
     }
 }
