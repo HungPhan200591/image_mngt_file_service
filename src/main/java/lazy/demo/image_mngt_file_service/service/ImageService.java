@@ -13,6 +13,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +33,10 @@ public class ImageService {
 
     public List<Image> getAllImages() {
         return imageRepository.findAll();
+    }
+
+    public Image getImage(UUID id) {
+        return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
     }
 
     public Image getImageById(UUID id) {
@@ -73,17 +78,19 @@ public class ImageService {
             image.setImageFileName(baseName);
             image.setMimeType(extension);
             image.setUrl(file.getPath());
+            image.setUploadedAt(LocalDateTime.now());
+            image.setSize(file.length());
 
             images.add(image);
         }
 
-        System.out.println(images);
         imageRepository.saveAll(images);
     }
 
     public Image getImage (File file) throws IOException {
 
         Image image = new Image();
+        image.set_imageId(UUID.randomUUID());
         try (ImageInputStream stream = ImageIO.createImageInputStream(file)) {
             ImageReader reader = ImageIO.getImageReaders(stream).next();
             reader.setInput(stream);
@@ -105,5 +112,9 @@ public class ImageService {
 
     public void deleteAllImage() {
         imageRepository.deleteAll();
+    }
+
+    public void uploadImage() {
+
     }
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "images")
+@Document(collection = "image")
 public class Image {
     @Id
     private UUID _imageId;
@@ -33,10 +33,4 @@ public class Image {
     private String imageArtist;
     private long size;
 
-    @PostConstruct
-    private void init() {
-        if (this._imageId == null) {
-            this._imageId = UUID.randomUUID();
-        }
-    }
 }
