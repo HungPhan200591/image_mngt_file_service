@@ -1,6 +1,7 @@
 package lazy.demo.image_mngt_file_service.controller;
 
 import jakarta.websocket.server.PathParam;
+import lazy.demo.image_mngt_file_service.csv.CsvToDbService;
 import lazy.demo.image_mngt_file_service.dto.resp.GenericResponse;
 import lazy.demo.image_mngt_file_service.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -22,6 +24,8 @@ public class ImageController {
 
     private final ImageService imageService;
 
+    private final CsvToDbService csvToDbService;
+
     @GetMapping()
     public ResponseEntity<GenericResponse<?>> getAllImages() {
         return ResponseEntity.ok(GenericResponse.success(imageService.getAllImages()));
@@ -29,7 +33,8 @@ public class ImageController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GenericResponse<?>> getImageById(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(GenericResponse.success(imageService.getImage(id)));
+        return ResponseEntity.ok(GenericResponse.success(imageService.getImage
+                (id)));
     }
 
     @PostMapping()
@@ -49,5 +54,11 @@ public class ImageController {
     public ResponseEntity<GenericResponse<?>> uploadImage() {
         imageService.uploadImage();
         return ResponseEntity.ok(GenericResponse.success("success"));
+    }
+
+    @GetMapping("/upload-csv")
+    public String uploadCsv() {
+        csvToDbService.insertCsvDataToDb();
+        return "Đã upload và chèn dữ liệu từ file CSV vào MongoDB.";
     }
 }
