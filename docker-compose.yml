@@ -1,0 +1,30 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - file_mongo_data:/data/db
+
+
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: image-mngt-file-service
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/image_mngt_file_service
+
+
+volumes:
+  file_mongo_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: E:/Study/Project/image_mngt_file_service/mongo_data
