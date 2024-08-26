@@ -2,7 +2,9 @@ package lazy.demo.image_mngt_file_service.controller;
 
 import jakarta.websocket.server.PathParam;
 import lazy.demo.image_mngt_file_service.csv.CsvToDbService;
+import lazy.demo.image_mngt_file_service.csv.CsvToDbThreadService;
 import lazy.demo.image_mngt_file_service.dto.resp.GenericResponse;
+import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
 import lazy.demo.image_mngt_file_service.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +28,8 @@ public class ImageController {
     private final ImageService imageService;
 
     private final CsvToDbService csvToDbService;
+    private final CsvToDbThreadService csvToDbThreadService;
+
 
     @GetMapping()
     public ResponseEntity<GenericResponse<?>> getAllImages() {
@@ -60,5 +65,41 @@ public class ImageController {
     public String uploadCsv() {
         csvToDbService.insertCsvDataToDb();
         return "Đã upload và chèn dữ liệu từ file CSV vào MongoDB.";
+    }
+
+    @GetMapping("/upload-csv-thread")
+    public String uploadCsvThread() {
+        csvToDbThreadService.insertCsvDataToDb();
+        return "Đã upload và chèn dữ liệu từ file CSV vào MongoDB bằng Thread.";
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<GenericResponse<?>> countImage() {
+
+        long count = imageService.countImage();
+
+        return ResponseEntity.ok(GenericResponse.success(count));
+    }
+
+    @GetMapping("/count-first-letter")
+    public ResponseEntity<GenericResponse<?>> countImageByFirstLetter() {
+
+        List<ImageFileNameCount> count = imageService.countImageByFirstLetter();
+
+        return ResponseEntity.ok(GenericResponse.success(count));
+    }
+
+    @GetMapping("/count-images-starting-with")
+    public ResponseEntity<GenericResponse<?>> countImagesStartingWith(@RequestParam char letter) {
+        long count =  imageService.countImagesStartingWith(letter);
+
+        return ResponseEntity.ok(GenericResponse.success(count));
+    }
+
+    @GetMapping("/count-images-with-width-less-than")
+    public ResponseEntity<GenericResponse<?>> countImagesWithWidthLessThan(@RequestParam int width) {
+        long count = imageService.countImagesWithWidthLessThan(width);
+
+        return ResponseEntity.ok(GenericResponse.success(count));
     }
 }

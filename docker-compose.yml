@@ -5,7 +5,15 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - file_mongo_data:/data/db
+      - file_mongo_db:/data/db
+
+volumes:
+  file_mongo_db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: E:/Study/Project/image_mngt_file_service/mongo_data
 
 
 #  app:
@@ -20,11 +28,3 @@ services:
 #    environment:
 #      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/image_mngt_file_service
 
-
-volumes:
-  file_mongo_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: E:/Study/Project/image_mngt_file_service/mongo_data

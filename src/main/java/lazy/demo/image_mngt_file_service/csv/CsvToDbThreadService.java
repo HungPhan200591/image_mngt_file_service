@@ -13,19 +13,26 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
-public class CsvToDbService {
+public class CsvToDbThreadService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private static final int THREAD_COUNT = 10;
+    private static final int BATCH_SIZE = 10000;
+
     /**
-     * Đọc dữ liệu từ file CSV và chèn vào MongoDB.
-     *
+     * Đọc dữ liệu từ file CSV và chèn vào MongoDB bằng nhiều luồng.
      */
     public void insertCsvDataToDb() {
         String csvFilePath = "100million.csv";
+        ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
+
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             List<Image> images = new ArrayList<>();
             String[] line;
@@ -53,24 +60,35 @@ public class CsvToDbService {
 
                 images.add(image);
 
-                // Nếu danh sách đã đủ lớn (ví dụ 1000 bản ghi), hãy chèn vào DB
-                if (images.size() == 1000) {
-                    System.out.println("Chèn 1000 bản ghi vào MongoDB...");
-                    mongoTemplate.insertAll(images);
-                    images.clear(); // Xóa danh sách sau khi chèn
+                if (images.size() >= BATCH_SIZE) {
+                    final List<Image> batch = new ArrayList<>(images);
+                    executorService.submit(() -> insertBatch(batch));
+                    images.clear();
                 }
             }
 
             // Chèn những bản ghi còn lại trong danh sách
             if (!images.isEmpty()) {
-                mongoTemplate.insertAll(images);
+                executorService.submit(() -> insertBatch(images));
             }
+
+            executorService.shutdown();
+            executorService.awaitTermination(1, TimeUnit.HOURS);
 
             System.out.println("Đã chèn dữ liệu từ file CSV vào MongoDB thành công.");
 
-        } catch (IOException | CsvValidationException e) {
+        } catch (IOException | CsvValidationException | InterruptedException e) {
             e.printStackTrace();
             System.out.println("Lỗi khi đọc file CSV hoặc chèn dữ liệu vào MongoDB.");
+        }
+    }
+
+    private void insertBatch(List<Image> images) {
+        try {
+            System.out.println("Chèn " + images.size() + " bản ghi vào MongoDB...");
+            mongoTemplate.insertAll(images);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

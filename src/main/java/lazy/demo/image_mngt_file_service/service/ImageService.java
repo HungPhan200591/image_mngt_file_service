@@ -1,10 +1,17 @@
 package lazy.demo.image_mngt_file_service.service;
 
+import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.springframework.boot.r2dbc.ConnectionFactoryBuilder.withOptions;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,6 +35,7 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
+    private final MongoTemplate mongoTemplate;
 
     public Image saveImage(Image image) {
         return imageRepository.save(image);
@@ -116,5 +126,39 @@ public class ImageService {
 
     public void uploadImage() {
 
+    }
+
+    public long countImage() {
+        return  imageRepository.countBy();
+//        return mongoTemplate.getCollection("image").countDocuments();
+    }
+
+    public List<ImageFileNameCount> countImageByFirstLetter() {
+        return  imageRepository.countImagesByFirstLetter();
+//        AggregationOptions options = AggregationOptions.builder()
+//                .allowDiskUse(true)  // Sử dụng đĩa nếu RAM không đủ
+//                .build();
+//
+//
+//        Aggregation aggregation = Aggregation.newAggregation(
+//                // Bước $project
+//                Aggregation.project().andExpression("substrCP(image_file_name, 0, 1)").as("firstLetter"),
+//
+//                // Bước $group
+//                Aggregation.group("firstLetter").count().as("count"),
+//                // Bước $sort
+//                Aggregation.sort(Sort.by(Sort.Direction.ASC, "_id"))
+//        ).withOptions(options);
+//
+//        AggregationResults<ImageFileNameCount> result = mongoTemplate.aggregate(aggregation, "image", ImageFileNameCount.class);
+//        return result.getMappedResults();
+    }
+
+    public long countImagesStartingWith(char letter) {
+        return imageRepository.countByFileNameStartingWith(letter);
+    }
+
+    public long countImagesWithWidthLessThan(int width) {
+        return imageRepository.countByImageWidthLessThan(width);
     }
 }
