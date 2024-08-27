@@ -107,9 +107,9 @@ public class ImageController {
 
     @GetMapping("/user/{user_id}")
     public ResponseEntity<GenericResponse<?>> getAllImageByUser(@PathVariable(value = "user_id") Long userId,
-                                                                @RequestParam(name = "page_no") int pageNo,
-                                                                @RequestParam(name = "page_size") int pageSize,
-                                                                @RequestParam(name = "sort_by") String sortBy) {
+                                                                @RequestParam(name = "page_no", required = false) Integer pageNo,
+                                                                @RequestParam(name = "page_size", required = false) Integer pageSize,
+                                                                @RequestParam(name = "sort_by", required = false) String sortBy) {
 
         Pageable pageable = PaginationUtil.createPageable(pageNo, pageSize, sortBy);
 
