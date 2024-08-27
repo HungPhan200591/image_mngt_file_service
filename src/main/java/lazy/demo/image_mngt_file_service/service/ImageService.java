@@ -7,6 +7,9 @@ import lazy.demo.image_mngt_file_service.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -131,23 +134,7 @@ public class ImageService {
 
     public List<ImageFileNameCount> countImageByFirstLetter() {
         return  imageRepository.countImagesByFirstLetter();
-//        AggregationOptions options = AggregationOptions.builder()
-//                .allowDiskUse(true)  // Sử dụng đĩa nếu RAM không đủ
-//                .build();
-//
-//
-//        Aggregation aggregation = Aggregation.newAggregation(
-//                // Bước $project
-//                Aggregation.project().andExpression("substrCP(image_file_name, 0, 1)").as("firstLetter"),
-//
-//                // Bước $group
-//                Aggregation.group("firstLetter").count().as("count"),
-//                // Bước $sort
-//                Aggregation.sort(Sort.by(Sort.Direction.ASC, "_id"))
-//        ).withOptions(options);
-//
-//        AggregationResults<ImageFileNameCount> result = mongoTemplate.aggregate(aggregation, "image", ImageFileNameCount.class);
-//        return result.getMappedResults();
+
     }
 
     public long countImagesStartingWith(char letter) {
@@ -156,6 +143,11 @@ public class ImageService {
 
     public long countImagesWithWidthLessThan(int width) {
         return imageRepository.countByImageWidthLessThan(width);
+    }
+
+    public List<Image> findTopByImageFileNameStartingWith(int pageNumber, int pageSize, String searchValue) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, "imageFileName"));
+        return imageRepository.findTop10ByImageFileNameStartingWith(searchValue, pageable);
     }
 
     public Page<Image> getAllImageByUser(Long userId, Pageable pageable) {

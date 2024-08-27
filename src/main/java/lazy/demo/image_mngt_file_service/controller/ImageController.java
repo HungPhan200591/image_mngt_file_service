@@ -35,6 +35,7 @@ public class ImageController {
     private final CsvToDbService csvToDbService;
     private final CsvToDbThreadService csvToDbThreadService;
 
+
     @GetMapping()
     public ResponseEntity<GenericResponse<?>> getAllImages() {
         return ResponseEntity.ok(GenericResponse.success(imageService.getAllImages()));
@@ -103,6 +104,17 @@ public class ImageController {
     public ResponseEntity<GenericResponse<?>> countImagesWithWidthLessThan(@RequestParam int width) {
         long count = imageService.countImagesWithWidthLessThan(width);
         return ResponseEntity.ok(GenericResponse.success(count));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<GenericResponse<?>> searchImages(
+            @RequestParam(name = "page_num") int pageNumber,
+            @RequestParam(name = "page_size") int pageSize,
+            @RequestParam(name = "search") String searchValue) {
+
+        List<Image> images = imageService.findTopByImageFileNameStartingWith(pageNumber, pageSize, searchValue);
+
+        return ResponseEntity.ok(GenericResponse.success(images));
     }
 
     @GetMapping("/user/{user_id}")
