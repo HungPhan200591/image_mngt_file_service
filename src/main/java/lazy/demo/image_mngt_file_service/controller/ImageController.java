@@ -5,8 +5,13 @@ import lazy.demo.image_mngt_file_service.csv.CsvToDbService;
 import lazy.demo.image_mngt_file_service.csv.CsvToDbThreadService;
 import lazy.demo.image_mngt_file_service.dto.resp.GenericResponse;
 import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
+import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.service.ImageService;
+import lazy.demo.image_mngt_file_service.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +34,6 @@ public class ImageController {
 
     private final CsvToDbService csvToDbService;
     private final CsvToDbThreadService csvToDbThreadService;
-
 
     @GetMapping()
     public ResponseEntity<GenericResponse<?>> getAllImages() {
@@ -92,14 +96,24 @@ public class ImageController {
     @GetMapping("/count-images-starting-with")
     public ResponseEntity<GenericResponse<?>> countImagesStartingWith(@RequestParam char letter) {
         long count =  imageService.countImagesStartingWith(letter);
-
         return ResponseEntity.ok(GenericResponse.success(count));
     }
 
     @GetMapping("/count-images-with-width-less-than")
     public ResponseEntity<GenericResponse<?>> countImagesWithWidthLessThan(@RequestParam int width) {
         long count = imageService.countImagesWithWidthLessThan(width);
-
         return ResponseEntity.ok(GenericResponse.success(count));
+    }
+
+    @GetMapping("/user/{user_id}")
+    public ResponseEntity<GenericResponse<?>> getAllImageByUser(@PathVariable(value = "user_id") Long userId,
+                                                                @RequestParam(name = "page_no") int pageNo,
+                                                                @RequestParam(name = "page_size") int pageSize,
+                                                                @RequestParam(name = "sort_by") String sortBy) {
+
+        Pageable pageable = PaginationUtil.createPageable(pageNo, pageSize, sortBy);
+
+        Page<Image> images = imageService.getAllImageByUser(userId, pageable);
+        return ResponseEntity.ok(GenericResponse.success(images));
     }
 }
