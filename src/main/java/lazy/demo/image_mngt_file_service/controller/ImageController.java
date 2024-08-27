@@ -1,15 +1,14 @@
 package lazy.demo.image_mngt_file_service.controller;
 
-import jakarta.websocket.server.PathParam;
 import lazy.demo.image_mngt_file_service.csv.CsvToDbService;
 import lazy.demo.image_mngt_file_service.csv.CsvToDbThreadService;
 import lazy.demo.image_mngt_file_service.dto.resp.GenericResponse;
 import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.service.ImageService;
+import lazy.demo.image_mngt_file_service.service.UpdateService;
 import lazy.demo.image_mngt_file_service.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +31,7 @@ import java.util.UUID;
 public class ImageController {
 
     private final ImageService imageService;
+    private final UpdateService updateService;
 
     private final CsvToDbService csvToDbService;
     private final CsvToDbThreadService csvToDbThreadService;
@@ -122,10 +123,18 @@ public class ImageController {
                                                                 @RequestParam(name = "page_no", required = false) Integer pageNo,
                                                                 @RequestParam(name = "page_size", required = false) Integer pageSize,
                                                                 @RequestParam(name = "sort_by", required = false) String sortBy) {
-
+        System.out.println("userId: " + userId);
         Pageable pageable = PaginationUtil.createPageable(pageNo, pageSize, sortBy);
 
         Page<Image> images = imageService.getAllImageByUser(userId, pageable);
         return ResponseEntity.ok(GenericResponse.success(images));
+    }
+
+    @PutMapping()
+    public ResponseEntity<GenericResponse<?>> updateUserId() {
+
+        updateService.updateData();
+
+        return ResponseEntity.ok(GenericResponse.success("success"));
     }
 }

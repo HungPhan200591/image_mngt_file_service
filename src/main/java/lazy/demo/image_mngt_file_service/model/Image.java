@@ -1,6 +1,5 @@
 package lazy.demo.image_mngt_file_service.model;
 
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

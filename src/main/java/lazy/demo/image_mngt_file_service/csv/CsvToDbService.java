@@ -3,6 +3,7 @@ package lazy.demo.image_mngt_file_service.csv;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lazy.demo.image_mngt_file_service.model.Image;
+import lazy.demo.image_mngt_file_service.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.UUID;
 public class CsvToDbService {
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    private ImageRepository imageRepository;
 
     /**
      * Đọc dữ liệu từ file CSV và chèn vào MongoDB.
@@ -56,14 +57,14 @@ public class CsvToDbService {
                 // Nếu danh sách đã đủ lớn (ví dụ 1000 bản ghi), hãy chèn vào DB
                 if (images.size() == 1000) {
                     System.out.println("Chèn 1000 bản ghi vào MongoDB...");
-                    mongoTemplate.insertAll(images);
+                    imageRepository.saveAll(images);
                     images.clear(); // Xóa danh sách sau khi chèn
                 }
             }
 
             // Chèn những bản ghi còn lại trong danh sách
             if (!images.isEmpty()) {
-                mongoTemplate.insertAll(images);
+                imageRepository.saveAll(images);
             }
 
             System.out.println("Đã chèn dữ liệu từ file CSV vào MongoDB thành công.");

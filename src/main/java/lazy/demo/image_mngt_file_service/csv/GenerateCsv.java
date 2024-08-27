@@ -2,7 +2,12 @@ package lazy.demo.image_mngt_file_service.csv;
 
 import com.github.javafaker.Faker;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class GenerateCsv {
-    private static final int TOTAL_RECORDS = 1000000;
+    private static final int TOTAL_RECORDS = 10000000;
     private static final int THREAD_COUNT = 20;  // Số luồng (threads)
     private static final int BUFFER_SIZE = 1024 * 1024; // 1MB buffer size for file operations
 
