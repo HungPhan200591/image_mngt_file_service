@@ -62,15 +62,15 @@ public class ImageController {
     }
 
     @GetMapping("/upload-csv")
-    public String uploadCsv() {
+    public ResponseEntity<GenericResponse<?>> uploadCsv() {
         csvToDbService.insertCsvDataToDb();
-        return "Đã upload và chèn dữ liệu từ file CSV vào MongoDB.";
+        return ResponseEntity.ok(GenericResponse.success("Đã upload và chèn dữ liệu từ file CSV vào MongoDB."));
     }
 
     @GetMapping("/upload-csv-thread")
-    public String uploadCsvThread() {
+    public ResponseEntity<GenericResponse<?>> uploadCsvThread() {
         csvToDbThreadService.insertCsvDataToDb();
-        return "Đã upload và chèn dữ liệu từ file CSV vào MongoDB bằng Thread.";
+        return ResponseEntity.ok(GenericResponse.success("Đã upload và chèn dữ liệu từ file CSV vào MongoDB bằng Thread."));
     }
 
     @GetMapping("/count")
