@@ -64,7 +64,7 @@ public class GenerateCsv {
             StringBuilder sb = new StringBuilder();
             for (int i = start; i < end; i++) {
                 sb.setLength(0);  // Reset StringBuilder
-                sb.append(faker.idNumber().valid()).append(',')
+                sb.append(random.nextInt(100)).append(',')
                         .append(faker.internet().url()).append(',')
                         .append(faker.file().fileName()).append(',')
                         .append(LocalDateTime.now().minusDays(random.nextInt(365))).append(',')

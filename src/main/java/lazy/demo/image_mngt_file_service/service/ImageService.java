@@ -3,15 +3,13 @@ package lazy.demo.image_mngt_file_service.service;
 import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.repository.ImageRepository;
+import lazy.demo.image_mngt_file_service.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
-import static org.springframework.boot.r2dbc.ConnectionFactoryBuilder.withOptions;
 
 @Service
 @Transactional
@@ -161,4 +157,10 @@ public class ImageService {
     public long countImagesWithWidthLessThan(int width) {
         return imageRepository.countByImageWidthLessThan(width);
     }
+
+    public Page<Image> getAllImageByUser(Long userId, Pageable pageable) {
+
+        return imageRepository.findByUserId(userId, pageable);
+    }
+
 }

@@ -2,6 +2,8 @@ package lazy.demo.image_mngt_file_service.repository;
 
 import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
 import lazy.demo.image_mngt_file_service.model.Image;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -29,4 +31,5 @@ public interface ImageRepository extends MongoRepository<Image, UUID> {
     @Query(value = "{ 'image_width': { $lt: ?0 } }", count = true)
     long countByImageWidthLessThan(int width);
 
+    Page<Image> findByUserId(Long userId, Pageable pageable);
 }

@@ -43,7 +43,7 @@ public class CsvToDbThreadService {
             while ((line = reader.readNext()) != null) {
                 Image image = Image.builder()
                         ._imageId(UUID.randomUUID())
-                        .userId(line[0])
+                        .userId(Long.parseLong(line[0]))
                         .url(line[1])
                         .imageFileName(line[2])
                         .uploadedAt(LocalDateTime.parse(line[3]))

@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Image {
     @Id
     private UUID _imageId;
-    private String userId;
+    private Long userId;
     private String url;
     private String imageFileName;
     private LocalDateTime uploadedAt;
