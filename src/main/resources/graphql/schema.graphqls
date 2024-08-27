@@ -1,0 +1,19 @@
+
+type Image {
+    imageId: ID!
+    userId: String
+    url: String
+    fileName: String
+    uploadedAt: String
+    mimeType: String
+    size: Int
+}
+
+input ImageInput {
+    userId: String
+    url: String
+    fileName: String
+    uploadedAt: String
+    mimeType: String
+    size: Int
+}

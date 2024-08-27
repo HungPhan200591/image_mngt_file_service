@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Volume docker ###
+mongo_data/
+
+### Large Files ###
+100million.csv
