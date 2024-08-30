@@ -16,7 +16,9 @@ public enum ErrorEnum {
     INVALID_REQUEST("REQ_001", "Invalid request"), // Yêu cầu không hợp lệ
 
     // Mã lỗi cho hệ thống
-    INTERNAL_SERVER_ERROR("SYS_001", "Internal server error"); // Lỗi hệ thống
+    INTERNAL_SERVER_ERROR("SYS_001", "Internal server error"), // Lỗi hệ thống
+
+    IMAGE_NOT_FOUND ("IMG_001", "Image not found"); // Lỗi hệ thống
 
     private final String errCode;
     private final String errMessage;

@@ -1,6 +1,8 @@
 package lazy.demo.image_mngt_file_service.service;
 
 import lazy.demo.image_mngt_file_service.dto.resp.ImageFileNameCount;
+import lazy.demo.image_mngt_file_service.enums.ErrorEnum;
+import lazy.demo.image_mngt_file_service.exception.CustomException;
 import lazy.demo.image_mngt_file_service.model.Image;
 import lazy.demo.image_mngt_file_service.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,15 +45,15 @@ public class ImageService {
     }
 
     public Image getImage(UUID id) {
-        return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
+        return imageRepository.findById(id).orElseThrow(() -> new CustomException(ErrorEnum.IMAGE_NOT_FOUND));
     }
 
     public Image getImageById(UUID id) {
-        return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
+        return imageRepository.findById(id).orElseThrow(() ->  new CustomException(ErrorEnum.IMAGE_NOT_FOUND));
     }
 
     public void deleteImage(UUID id) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
+        Image image = imageRepository.findById(id).orElseThrow(() ->  new CustomException(ErrorEnum.IMAGE_NOT_FOUND));
         imageRepository.delete(image);
     }
 

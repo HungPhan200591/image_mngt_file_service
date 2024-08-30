@@ -13,7 +13,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: E:/Study/Project/image_mngt_file_service/mongo_data
+      device: D:/Study/image_mngt_file_service/mongo_data
 
 
 #  app:
