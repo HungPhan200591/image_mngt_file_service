@@ -17,18 +17,13 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +52,7 @@ public class MinioService {
         return "Uploaded file success: " + objectKey;
     }
 
-    public String uploadMultipartFile(MinioUploadRequest minioUploadRequest) throws IOException {
+    public String uploadMultipartFile(MinioUploadRequest minioUploadRequest) {
         MultipartFile file = minioUploadRequest.getFile();
         String objectKey = file.getOriginalFilename();
         CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
@@ -69,26 +64,25 @@ public class MinioService {
         String uploadId = response.uploadId();
 
         List<CompletedPart> completedParts = new ArrayList<>();
-        int partSize = 50 * 1024 * 1024; // 5MB
+        int partSize = 64 * 1024 * 1024; // 64MB
         byte[] buffer = new byte[partSize];
 
         // Tạo ExecutorService với số lượng luồng tùy chỉnh
-        int numberOfThreads = 10; // Số luồng bạn muốn sử dụng
+        int numberOfThreads = 4; // Giảm số lượng luồng để giảm tiêu thụ bộ nhớ
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        List<Future<CompletedPart>> futures = new ArrayList<>();
 
         try (InputStream inputStream = file.getInputStream()) {
             int bytesRead;
             int partNumber = 1;
 
             while ((bytesRead = inputStream.read(buffer)) != -1) {
-
-                byte[] data = new byte[bytesRead];
-                System.arraycopy(buffer, 0, data, 0, bytesRead);
-
                 final int currentPartNumber = partNumber;
                 final int currentBytesRead = bytesRead;
-                Callable<CompletedPart> task = () -> {
+                final byte[] data = new byte[currentBytesRead];
+                System.arraycopy(buffer, 0, data, 0, currentBytesRead);
+
+                // Sử dụng CompletableFuture để xử lý các phần tải lên không đồng bộ
+                CompletableFuture<CompletedPart> future = CompletableFuture.supplyAsync(() -> {
                     // Tải lên từng phần
                     UploadPartRequest uploadRequest = UploadPartRequest.builder()
                             .bucket(imageBucketName)
@@ -105,18 +99,13 @@ public class MinioService {
                             .partNumber(currentPartNumber)
                             .eTag(uploadPartResponse.eTag())
                             .build();
-                };
+                }, executorService);
 
-                // Thực thi tác vụ tải lên trong thread pool
-                futures.add(executorService.submit(task));
+                // Xử lý ngay khi future hoàn thành mà không lưu trữ tất cả các future trong bộ nhớ
+                completedParts.add(future.join());
 
                 System.out.println("Uploaded part: " + partNumber);
                 partNumber++;
-            }
-
-            // Chờ tất cả các tác vụ tải lên hoàn thành
-            for (Future<CompletedPart> future : futures) {
-                completedParts.add(future.get());
             }
         } catch (Exception e) {
             s3Client.abortMultipartUpload(AbortMultipartUploadRequest.builder()
