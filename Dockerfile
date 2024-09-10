@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/image_mngt_file_service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port the application runs on
-EXPOSE 8080
+EXPOSE 8082
 
 # Run the jar file
 ENTRYPOINT ["java", "-jar", "app.jar"]
