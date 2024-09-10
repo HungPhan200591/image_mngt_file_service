@@ -34,6 +34,7 @@ build/
 
 ### Volume docker ###
 mongo_data/
+minio_data/
 
 ### Large Files ###
 100million.csv
