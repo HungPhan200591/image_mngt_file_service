@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class GenerateCsv {
-    private static final int TOTAL_RECORDS = 10000000;
+    private static final int TOTAL_RECORDS = 1000;
     private static final int THREAD_COUNT = 20;  // Số luồng (threads)
     private static final int BUFFER_SIZE = 1024 * 1024; // 1MB buffer size for file operations
 

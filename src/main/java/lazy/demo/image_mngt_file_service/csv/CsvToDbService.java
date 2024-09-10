@@ -7,9 +7,11 @@ import lazy.demo.image_mngt_file_service.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,14 @@ public class CsvToDbService {
      * Đọc dữ liệu từ file CSV và chèn vào MongoDB.
      *
      */
-    public void insertCsvDataToDb() {
-        String csvFilePath = "100million.csv";
-        try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
+    public void insertCsvDataToDb(MultipartFile file) {
+        // Kiểm tra xem file có rỗng không
+        if (file.isEmpty()) {
+            System.out.println("File CSV không hợp lệ hoặc rỗng.");
+            return;
+        }
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
             List<Image> images = new ArrayList<>();
             String[] line;
 
@@ -74,4 +81,5 @@ public class CsvToDbService {
             System.out.println("Lỗi khi đọc file CSV hoặc chèn dữ liệu vào MongoDB.");
         }
     }
+
 }

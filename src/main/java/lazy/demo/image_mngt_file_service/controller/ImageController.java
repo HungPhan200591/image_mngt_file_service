@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,9 +68,12 @@ public class ImageController {
         return ResponseEntity.ok(GenericResponse.success("success"));
     }
 
-    @GetMapping("/upload-csv")
-    public ResponseEntity<GenericResponse<?>> uploadCsv() {
-        csvToDbService.insertCsvDataToDb();
+    @PostMapping("/upload-csv")
+    public ResponseEntity<GenericResponse<?>> uploadCsv(@RequestParam("file") MultipartFile file) {
+
+        // Gọi service để chèn dữ liệu từ file CSV vào DB
+        csvToDbService.insertCsvDataToDb(file);
+
         return ResponseEntity.ok(GenericResponse.success("Đã upload và chèn dữ liệu từ file CSV vào MongoDB."));
     }
 
